@@ -54,38 +54,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 		//Spawn pieces
 		pieces = new ArrayList<Piece>();
-		//white
-		for(int r=0; r<2; r++) {
-			for(int c=0; c<board[r].length; c++) {
-				if(r==0) {
-					if(c==0 || c==board[r].length-1) {
-						//ROOKS
-						Piece piece = new Piece(pieceTextures[0][3], true, PieceType.ROOK, new Vector2(c, r), blockSize);
-						pieces.add(piece);
-					} else if(c==1 || c==board[r].length-2) {
-						//KNIGHTS
-						Piece piece = new Piece(pieceTextures[0][1], true, PieceType.KNIGHT, new Vector2(c, r), blockSize);
-						pieces.add(piece);
-					} else if(c==2 || c==board[r].length-3) {
-						//BISHOPS
-						Piece piece = new Piece(pieceTextures[0][2], true, PieceType.BISHOP, new Vector2(c, r), blockSize);
-						pieces.add(piece);
-					} else if(c==3) {
-						//QUEEN
-						Piece piece = new Piece(pieceTextures[0][4], true, PieceType.QUEEN, new Vector2(c, r), blockSize);
-						pieces.add(piece);
-					} else if(c==4) {
-						//KING
-						Piece piece = new Piece(pieceTextures[0][5], true, PieceType.KING, new Vector2(c, r), blockSize);
-						pieces.add(piece);
-					}
-				} else {
-					//all pawns
-					Piece piece = new Piece(pieceTextures[0][0], true, PieceType.PAWN, new Vector2(c, r), blockSize);
-					pieces.add(piece);
-				}
-			}
-		}
+		spawnPieces();
 
 	}
 
@@ -238,6 +207,74 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 						//KING
 						pieceTextures[r][c] = new Texture("blackking.png");
 					}
+				}
+			}
+		}
+	}
+
+	private void spawnPieces() {
+		//white
+		for(int r=0; r<2; r++) {
+			for(int c=0; c<board[r].length; c++) {
+				if(r==0) {
+					if(c==0 || c==board[r].length-1) {
+						//ROOKS
+						Piece piece = new Piece(pieceTextures[0][3], true, PieceType.ROOK, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==1 || c==board[r].length-2) {
+						//KNIGHTS
+						Piece piece = new Piece(pieceTextures[0][1], true, PieceType.KNIGHT, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==2 || c==board[r].length-3) {
+						//BISHOPS
+						Piece piece = new Piece(pieceTextures[0][2], true, PieceType.BISHOP, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==3) {
+						//QUEEN
+						Piece piece = new Piece(pieceTextures[0][4], true, PieceType.QUEEN, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==4) {
+						//KING
+						Piece piece = new Piece(pieceTextures[0][5], true, PieceType.KING, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					}
+				} else {
+					//all pawns
+					Piece piece = new Piece(pieceTextures[0][0], true, PieceType.PAWN, new Vector2(c, r), blockSize);
+					pieces.add(piece);
+				}
+			}
+		}
+
+		//black
+		for(int r=6; r<8; r++) {
+			for(int c=0; c<board[r].length; c++) {
+				if(r==7) {
+					if(c==0 || c==board[r].length-1) {
+						//ROOKS
+						Piece piece = new Piece(pieceTextures[1][3], false, PieceType.ROOK, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==1 || c==board[r].length-2) {
+						//KNIGHTS
+						Piece piece = new Piece(pieceTextures[1][1], false, PieceType.KNIGHT, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==2 || c==board[r].length-3) {
+						//BISHOPS
+						Piece piece = new Piece(pieceTextures[1][2], false, PieceType.BISHOP, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==3) {
+						//QUEEN
+						Piece piece = new Piece(pieceTextures[1][4], false, PieceType.QUEEN, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==4) {
+						//KING
+						Piece piece = new Piece(pieceTextures[1][5], false, PieceType.KING, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					}
+				} else {
+					//all pawns
+					Piece piece = new Piece(pieceTextures[1][0], false, PieceType.PAWN, new Vector2(c, r), blockSize);
+					pieces.add(piece);
 				}
 			}
 		}
