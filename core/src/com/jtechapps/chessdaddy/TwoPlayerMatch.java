@@ -58,7 +58,27 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		for(int r=0; r<2; r++) {
 			for(int c=0; c<board[r].length; c++) {
 				if(r==0) {
-
+					if(c==0 || c==board[r].length-1) {
+						//ROOKS
+						Piece piece = new Piece(pieceTextures[0][3], true, PieceType.ROOK, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==1 || c==board[r].length-2) {
+						//KNIGHTS
+						Piece piece = new Piece(pieceTextures[0][1], true, PieceType.KNIGHT, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==2 || c==board[r].length-3) {
+						//BISHOPS
+						Piece piece = new Piece(pieceTextures[0][2], true, PieceType.BISHOP, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==3) {
+						//QUEEN
+						Piece piece = new Piece(pieceTextures[0][4], true, PieceType.QUEEN, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					} else if(c==4) {
+						//KING
+						Piece piece = new Piece(pieceTextures[0][5], true, PieceType.KING, new Vector2(c, r), blockSize);
+						pieces.add(piece);
+					}
 				} else {
 					//all pawns
 					Piece piece = new Piece(pieceTextures[0][0], true, PieceType.PAWN, new Vector2(c, r), blockSize);
