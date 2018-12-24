@@ -86,6 +86,11 @@ public class Piece extends Sprite {
                 {false, false, false, false, false, false, false, false}
         };
 
+        //Allowing all spots for testing with no enforced rules
+        possibleMoves = falsifyArray(possibleMoves);
+        possibleMoves = oppositeArray(possibleMoves);
+        //
+
         //find moves that are possible based on piece type
         if(pieceType == PieceType.PAWN) {
 
@@ -110,5 +115,35 @@ public class Piece extends Sprite {
 
         return possibleMoves;
     }
+
+    /**
+     * Set all to false
+     * @param arr
+     * @return arr but all false
+     */
+    private boolean[][] falsifyArray(boolean[][] arr) {
+        for(int i=0; i<arr.length; i++) {
+            for(int k=0; k<arr[i].length; k++) {
+                arr[i][k] = false;
+            }
+        }
+        return arr;
+    }
+
+    /**
+     *
+     * @param arr
+     * @return array with all opposite elements
+     */
+    private boolean[][] oppositeArray(boolean[][] arr) {
+        for(int i=0; i<arr.length; i++) {
+            for(int k=0; k<arr[i].length; k++) {
+                arr[i][k] = !arr[i][k];
+            }
+        }
+        return arr;
+    }
+
+
 
 }

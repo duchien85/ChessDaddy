@@ -1,5 +1,6 @@
 package com.jtechapps.chessdaddy;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
@@ -83,5 +84,33 @@ public class BoardCell extends Sprite {
 
     public BoardPosition getBoardPosition() {
         return boardPosition;
+    }
+
+    private boolean disableGuide = true;
+    /**
+     * Set this cell's active effects
+     */
+    public void setActive() {
+        if(!disableGuide) {
+            this.setColor(Color.BROWN);
+        }
+    }
+
+    /**
+     * Set the cells effect for being possible move for a piece
+     */
+    public void setPotential() {
+        if(!disableGuide) {
+            this.setColor(Color.YELLOW);
+        }
+    }
+
+    /**
+     * Set this cell back to it's normal color
+     */
+    public void setNormal() {
+        if(!disableGuide) {
+            this.setColor(Color.WHITE);
+        }
     }
 }

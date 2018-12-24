@@ -24,6 +24,18 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	private Texture[][] pieceTextures = new Texture[2][6];
 	//game mechanics
 	private boolean whitesTurns = true;
+	private boolean pieceActive = false;
+	private BoardPosition activePosition = new BoardPosition(0,0);
+	private boolean[][] possibleMoves =  {
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false},
+			{false, false, false, false, false, false, false, false}
+	};
 
 	public TwoPlayerMatch(Game g) {
 		game = g;
@@ -134,13 +146,54 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[0].length; c++) {
 				if(board[r][c].getBoundingRectangle().contains(screenX, height-screenY)) {
-					board[r][c].getPosition();
-					board[r][c].setColor(Color.BROWN);
+					board[r][c].getPosition();//Print out position touched
+
+					//Algo
+					//Check if touched cell has piece of current colors turn
+					if(board[r][c].isOccupied() && board[r][c].getOccupiedPiece().getIsWhite()==whitesTurns) {
+						activePosition.column = c;
+						activePosition.row = r;
+						pieceActive = true;
+						//load possible move locations
+						possibleMoves = board[r][c].getOccupiedPiece().getPossibleMoves(board);
+						//show possible move locations
+						for(int row=0; row<board.length; row++) {
+							for(int col=0; col<board[row].length; col++) {
+								if(possibleMoves[row][col]) {
+									//MOVE IS POSSIBLE TINT CELL
+									board[row][col].setPotential();
+								} else {
+									//MOVE ISN'T POSSIBLE TINT CELL
+									board[row][col].setNormal();
+								}
+							}
+						}
+						board[r][c].setActive();
+					}
+					//else if pieceactive check if cell is for possible move then move piece, if cell isn't possible disable pieceActive
+					else if(pieceActive) {
+						if(possibleMoves[r][c]) {
+							//User touched possible move
+							//move active piece to new position
+							board[activePosition.row][activePosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(r,c));
+							board[r][c].setOccupiedPiece(board[activePosition.row][activePosition.column].getOccupiedPiece());
+							board[activePosition.row][activePosition.column].setOccupiedPiece(null);
+							//
+							whitesTurns = !whitesTurns;//switch turns
+							//clear moves
+							clearPossibleMoves();
+						} else {
+							//User touched something else clear possible moves
+							clearPossibleMoves();
+						}
+					}
+
 					//test to see what piece is at board position
 					if(board[r][c].isOccupied()) {
 						System.out.println(board[r][c].getOccupiedPiece().getPieceType().toString());
 						System.out.println(board[r][c].getOccupiedPiece().getPieceColor());
-						board[r][c].setOccupiedPiece(null);
+						System.out.println(board[r][c].getOccupiedPiece().getIsWhite());
+
 					}
 				}
 
@@ -286,5 +339,18 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 				}
 			}
 		}
+	}
+
+	/**
+	 * set all posible moves to false and clear moves from screen and piece is no longer active
+	 */
+	private void clearPossibleMoves() {
+		for(int row=0; row<board.length; row++) {
+			for(int col=0; col<board[row].length; col++) {
+				possibleMoves[row][col] = false;
+				board[row][col].setNormal();
+			}
+		}
+		pieceActive = false;
 	}
 }
