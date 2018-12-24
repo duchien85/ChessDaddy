@@ -10,9 +10,11 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class BoardCell extends Sprite {
     private Piece occupiedPiece = null;
     private char row, column;
+    private BoardPosition boardPosition;
 
-    public BoardCell(Texture texture) {
+    public BoardCell(Texture texture, int row, int column) {
         super(texture);
+        boardPosition = new BoardPosition(row, column);
     }
 
     public boolean isOccupied() {
@@ -27,8 +29,9 @@ public class BoardCell extends Sprite {
     convert array to coordinate postions
      */
     public void setPiecePosition(int row, int col) {
+        //screen position
         char c;
-        switch (row) {
+        switch (col) {
             case 0:
                 c = 'A';
                 break;
@@ -56,13 +59,29 @@ public class BoardCell extends Sprite {
             default:
                 c= 'A';
         }
-        this.row = c;
-        this.column = (char) (col+1 + '0');
+        this.column = c;
+        this.row = (char) (row+1 + '0');
     }
 
+    /**
+     *  Currenly prints columnROW
+     * @return {row, column} keep in mind row=y column = x
+     */
     public char[] getPosition() {
         char[] pos = {row, column};
-        System.out.println(pos[0]+""+pos[1]);
+        System.out.println(pos[1]+""+pos[0]);
         return pos;
+    }
+
+    public Piece getOccupiedPiece() {
+        return occupiedPiece;
+    }
+
+    public void setOccupiedPiece(Piece piece) {
+        occupiedPiece = piece;
+    }
+
+    public BoardPosition getBoardPosition() {
+        return boardPosition;
     }
 }

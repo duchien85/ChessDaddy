@@ -22,7 +22,8 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	private BoardCell[][] board = new BoardCell[8][8];
 	//pieces
 	private Texture[][] pieceTextures = new Texture[2][6];
-	private ArrayList<Piece> pieces;
+	//game mechanics
+	private boolean whitesTurns = true;
 
 	public TwoPlayerMatch(Game g) {
 		game = g;
@@ -43,17 +44,16 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		//Add block background
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[r].length; c++) {
-				BoardCell boardTile = new BoardCell(((c%2==0 && r%2==0) || (c%2==1 && r%2==1)) ? img: img2);
+				BoardCell boardTile = new BoardCell(((c%2==0 && r%2==0) || (c%2==1 && r%2==1)) ? img: img2, r, c);
 				boardTile.setSize(blockSize, blockSize);
-				boardTile.setPosition(blockSize*r, blockSize*c);
+				boardTile.setPosition(blockSize*c, blockSize*r);//FIXED row should ne HEIGHT, COLUMN SHOULD BE X
 				boardTile.setOriginCenter();
-				boardTile.setPiecePosition(c, r);
+				boardTile.setPiecePosition(r, c);
 				board[r][c] = boardTile;
 			}
 		}
 
 		//Spawn pieces
-		pieces = new ArrayList<Piece>();
 		spawnPieces();
 
 	}
@@ -65,15 +65,16 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		batch.begin();
 		//draw board
 		for(int r=0; r<board.length; r++) {
-			for(int c=0; c<board[0].length; c++) {
+			for(int c=0; c<board[r].length; c++) {
 				board[r][c].draw(batch);
-
+				if(board[r][c].isOccupied())
+					board[r][c].getOccupiedPiece().draw(batch);
 			}
 		}
 		//draw pieces
-		for(Piece piece : pieces) {
+		/*for(Piece piece : pieces) {
 			piece.draw(batch);
-		}
+		}*/
 		batch.end();
 	}
 
@@ -134,11 +135,18 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			for(int c=0; c<board[0].length; c++) {
 				if(board[r][c].getBoundingRectangle().contains(screenX, height-screenY)) {
 					board[r][c].getPosition();
-					board[r][c].rotate(45);
+					board[r][c].setColor(Color.BROWN);
+					//test to see what piece is at board position
+					if(board[r][c].isOccupied()) {
+						System.out.println(board[r][c].getOccupiedPiece().getPieceType().toString());
+						System.out.println(board[r][c].getOccupiedPiece().getPieceColor());
+						board[r][c].setOccupiedPiece(null);
+					}
 				}
 
 			}
 		}
+
 		return false;
 	}
 
@@ -219,29 +227,29 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 				if(r==0) {
 					if(c==0 || c==board[r].length-1) {
 						//ROOKS
-						Piece piece = new Piece(pieceTextures[0][3], true, PieceType.ROOK, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[0][3], true, PieceType.ROOK, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==1 || c==board[r].length-2) {
 						//KNIGHTS
-						Piece piece = new Piece(pieceTextures[0][1], true, PieceType.KNIGHT, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[0][1], true, PieceType.KNIGHT, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==2 || c==board[r].length-3) {
 						//BISHOPS
-						Piece piece = new Piece(pieceTextures[0][2], true, PieceType.BISHOP, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[0][2], true, PieceType.BISHOP, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==3) {
 						//QUEEN
-						Piece piece = new Piece(pieceTextures[0][4], true, PieceType.QUEEN, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[0][4], true, PieceType.QUEEN, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==4) {
 						//KING
-						Piece piece = new Piece(pieceTextures[0][5], true, PieceType.KING, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[0][5], true, PieceType.KING, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					}
 				} else {
 					//all pawns
-					Piece piece = new Piece(pieceTextures[0][0], true, PieceType.PAWN, new Vector2(c, r), blockSize);
-					pieces.add(piece);
+					Piece piece = new Piece(pieceTextures[0][0], true, PieceType.PAWN, new BoardPosition(r, c), blockSize);
+					board[r][c].setOccupiedPiece(piece);
 				}
 			}
 		}
@@ -252,29 +260,29 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 				if(r==7) {
 					if(c==0 || c==board[r].length-1) {
 						//ROOKS
-						Piece piece = new Piece(pieceTextures[1][3], false, PieceType.ROOK, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[1][3], false, PieceType.ROOK, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==1 || c==board[r].length-2) {
 						//KNIGHTS
-						Piece piece = new Piece(pieceTextures[1][1], false, PieceType.KNIGHT, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[1][1], false, PieceType.KNIGHT, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==2 || c==board[r].length-3) {
 						//BISHOPS
-						Piece piece = new Piece(pieceTextures[1][2], false, PieceType.BISHOP, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[1][2], false, PieceType.BISHOP, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==3) {
 						//QUEEN
-						Piece piece = new Piece(pieceTextures[1][4], false, PieceType.QUEEN, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[1][4], false, PieceType.QUEEN, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					} else if(c==4) {
 						//KING
-						Piece piece = new Piece(pieceTextures[1][5], false, PieceType.KING, new Vector2(c, r), blockSize);
-						pieces.add(piece);
+						Piece piece = new Piece(pieceTextures[1][5], false, PieceType.KING, new BoardPosition(r, c), blockSize);
+						board[r][c].setOccupiedPiece(piece);
 					}
 				} else {
 					//all pawns
-					Piece piece = new Piece(pieceTextures[1][0], false, PieceType.PAWN, new Vector2(c, r), blockSize);
-					pieces.add(piece);
+					Piece piece = new Piece(pieceTextures[1][0], false, PieceType.PAWN, new BoardPosition(r, c), blockSize);
+					board[r][c].setOccupiedPiece(piece);
 				}
 			}
 		}

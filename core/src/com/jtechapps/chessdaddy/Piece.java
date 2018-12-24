@@ -3,10 +3,13 @@ package com.jtechapps.chessdaddy;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import java.util.ArrayList;
 
 /**
  * Created by JacobM on 12/23/18.
  */
+
+//TODO make each piece type into a separate class that extends Piece
 
 enum PieceType {
     PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING;
@@ -17,10 +20,12 @@ public class Piece extends Sprite {
     private boolean isWhite;
     private PieceType pieceType;
     //board position
-    private Vector2 boardPosition = new Vector2(0,0);
+    private BoardPosition boardPosition = new BoardPosition(0,0);
     private int blockSize;
+    //game mechanics
+    private int numberOfMoves = 0;
 
-    public Piece(Texture texture, boolean isWhite, PieceType pieceType, Vector2 boardPosition, int blockSize) {
+    public Piece(Texture texture, boolean isWhite, PieceType pieceType, BoardPosition boardPosition, int blockSize) {
         super(texture);
         this.isWhite = isWhite;
         this.pieceColor = (isWhite) ? "white" : "black";
@@ -49,14 +54,61 @@ public class Piece extends Sprite {
         this.isWhite = white;
     }
 
-    public Vector2 getBoardPosition() {
+    public BoardPosition getBoardPosition() {
         return boardPosition;
     }
 
-    public void setBoardPosition(Vector2 position) {
+    /**
+     * The board position row, column vector
+     * @param position
+     */
+    public void setBoardPosition(BoardPosition position) {
         this.boardPosition = position;
         //update actual position of sprite
-        this.setPosition(blockSize*boardPosition.x, blockSize*boardPosition.y);
+        this.setPosition(blockSize*boardPosition.column, blockSize*boardPosition.row);
+    }
+
+    /**
+     * Calculate a matrix of possible move locations for this piece
+     * @param board the board matrix of the game storing each position
+     * @return boolean matrix of possible move locations (true means this player can move to this location)
+     */
+    public boolean[][] getPossibleMoves(BoardCell[][] board) {
+        //start by 8 by 8 array with all false possible moves
+        boolean[][] possibleMoves = {
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false},
+                {false, false, false, false, false, false, false, false}
+        };
+
+        //find moves that are possible based on piece type
+        if(pieceType == PieceType.PAWN) {
+
+            //possibleMoves[boardPosition.y+1][boardPosition.x];
+            //only allow pawn to move 2 spots as first move
+            //only allow straight movement if nothing is in the way
+            //only allow diagonal movement to take enemy position
+        } else if(pieceType == PieceType.KNIGHT) {
+
+        }
+
+        //if there is a same color piece in the move spot, make it false
+        for(int row = 0; row < board.length; row++) {
+            for(int col = 0; col < board[row].length; col++) {
+                if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().isWhite == this.isWhite) {
+                    //set friendly pieces spots false for possible move locations
+                    possibleMoves[row][col] = false;
+                }
+            }
+        }
+        //if the move results in a the king being in danger, make it false
+
+        return possibleMoves;
     }
 
 }
