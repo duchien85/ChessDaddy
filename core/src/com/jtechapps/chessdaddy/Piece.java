@@ -87,17 +87,53 @@ public class Piece extends Sprite {
         };
 
         //Allowing all spots for testing with no enforced rules
-        possibleMoves = falsifyArray(possibleMoves);
-        possibleMoves = oppositeArray(possibleMoves);
+        //possibleMoves = falsifyArray(possibleMoves);
+        //possibleMoves = oppositeArray(possibleMoves);
         //
 
         //find moves that are possible based on piece type
         if(pieceType == PieceType.PAWN) {
-
-            //possibleMoves[boardPosition.y+1][boardPosition.x];
             //only allow pawn to move 2 spots as first move
             //only allow straight movement if nothing is in the way
             //only allow diagonal movement to take enemy position
+            //make sure not out of bounds
+
+            int direction = (isWhite) ? 1: -1;
+            int row, col;
+
+            //straight ahead ONCE to NON Occupied cell
+            row = boardPosition.row+direction;
+            col = boardPosition.column;
+            if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                if(!board[row][col].isOccupied())
+                    possibleMoves[row][col] = true;
+            }
+
+            //straight ahead TWICE to NON Occupied cell
+            if(numberOfMoves==0) {
+                row = boardPosition.row + direction*2;
+                col = boardPosition.column;
+                if ((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if (!board[row][col].isOccupied())
+                        possibleMoves[row][col] = true;
+                }
+            }
+
+            //diagonal left
+            row = boardPosition.row+direction;
+            col = boardPosition.column-1;
+            if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                    possibleMoves[row][col] = true;
+            }
+            //diagonal right
+            row = boardPosition.row+direction;
+            col = boardPosition.column+1;
+            if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                    possibleMoves[row][col] = true;
+            }
+
         } else if(pieceType == PieceType.KNIGHT) {
 
         }
@@ -144,6 +180,8 @@ public class Piece extends Sprite {
         return arr;
     }
 
-
+    public void addMove() {
+        numberOfMoves++;
+    }
 
 }

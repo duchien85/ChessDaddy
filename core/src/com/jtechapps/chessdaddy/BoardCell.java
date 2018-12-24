@@ -86,7 +86,7 @@ public class BoardCell extends Sprite {
         return boardPosition;
     }
 
-    private boolean disableGuide = true;
+    private boolean disableGuide = false;
     /**
      * Set this cell's active effects
      */

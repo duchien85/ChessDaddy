@@ -178,6 +178,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 							board[activePosition.row][activePosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(r,c));
 							board[r][c].setOccupiedPiece(board[activePosition.row][activePosition.column].getOccupiedPiece());
 							board[activePosition.row][activePosition.column].setOccupiedPiece(null);
+							board[r][c].getOccupiedPiece().addMove();
 							//
 							whitesTurns = !whitesTurns;//switch turns
 							//clear moves
