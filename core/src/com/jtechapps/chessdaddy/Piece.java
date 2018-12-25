@@ -319,7 +319,6 @@ public class Piece extends Sprite {
                 }
             }
         } else if(pieceType == PieceType.KING) {
-            //L shape spots make sure spot isn't out of bounds and that there is no same color piece
             int[][] kingSpots = {
                     {boardPosition.row-1, boardPosition.column-1},
                     {boardPosition.row, boardPosition.column-1},
