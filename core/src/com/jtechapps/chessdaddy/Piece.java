@@ -239,7 +239,85 @@ public class Piece extends Sprite {
                 }
             }
         } else if(pieceType == PieceType.ROOK) {
+            //orthogonal moving until blocked or out of bounds
+            //if blocked by friendly piece don't allow move and break search to farther spot.
+            //else if blocked by enemy piece stop search and include spot
 
+            //LEFT
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row;
+                int col = boardPosition.column-d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //RIGHT
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row;
+                int col = boardPosition.column+d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //TOP
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row+d;
+                int col = boardPosition.column;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //BOTTOM
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row-d;
+                int col = boardPosition.column;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
         } else if(pieceType == PieceType.QUEEN) {
 
         } else if(pieceType == PieceType.KING) {
