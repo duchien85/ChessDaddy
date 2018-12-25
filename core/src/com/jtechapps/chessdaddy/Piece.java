@@ -158,6 +158,92 @@ public class Piece extends Sprite {
                         possibleMoves[row][col] = true;
                 }
             }
+        } else if(pieceType == PieceType.BISHOP) {
+            //diagonal moving until blocked or out of bounds
+            //if blocked by friendly piece don't allow move and break search to farther spot.
+            //else if blocked by enemy piece stop search and include spot
+
+            //diagonal top left
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row+d;
+                int col = boardPosition.column-d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //diagonal top right
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row+d;
+                int col = boardPosition.column+d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //diagonal bottom left
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row-d;
+                int col = boardPosition.column-d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //diagonal bottom right
+            for(int d=1; d<8; d++) {
+                int row = boardPosition.row-d;
+                int col = boardPosition.column+d;
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(board[row][col].isOccupied()) {
+                        //path "ran into" a piece
+                        if(board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
+                            possibleMoves[row][col] = true;
+                        break;
+                    } else {
+                        possibleMoves[row][col] = true;
+                        //continue loop
+                    }
+                } else {
+                    break;
+                }
+            }
+        } else if(pieceType == PieceType.ROOK) {
+
+        } else if(pieceType == PieceType.QUEEN) {
+
+        } else if(pieceType == PieceType.KING) {
+
         }
 
         //if there is a same color piece in the move spot, make it false
