@@ -1,6 +1,7 @@
 # ChessDaddy
 Game of Chess
 
+![Screenshot](screenshot1.png)
 <h2>Features</h2>
 <h3>Graphics</h3>
 <ul>
