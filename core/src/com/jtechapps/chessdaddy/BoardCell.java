@@ -12,10 +12,13 @@ public class BoardCell extends Sprite {
     private Piece occupiedPiece = null;
     private char row, column;
     private BoardPosition boardPosition;
+    private Color defaultColor;
 
-    public BoardCell(Texture texture, int row, int column) {
+    public BoardCell(Texture texture, Color defaultColor, int row, int column) {
         super(texture);
         boardPosition = new BoardPosition(row, column);
+        this.defaultColor = defaultColor;
+        setColor(defaultColor);
     }
 
     public boolean isOccupied() {
@@ -92,7 +95,7 @@ public class BoardCell extends Sprite {
      */
     public void setActive() {
         if(!disableGuide) {
-            this.setColor(Color.BROWN);
+            this.setColor(Color.GRAY);
         }
     }
 
@@ -101,7 +104,7 @@ public class BoardCell extends Sprite {
      */
     public void setPotential() {
         if(!disableGuide) {
-            this.setColor(Color.YELLOW);
+            this.setColor(Color.TAN);
         }
     }
 
@@ -110,7 +113,7 @@ public class BoardCell extends Sprite {
      */
     public void setNormal() {
         if(!disableGuide) {
-            this.setColor(Color.WHITE);
+            this.setColor(defaultColor);
         }
     }
 }

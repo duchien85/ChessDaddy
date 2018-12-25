@@ -10,11 +10,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.math.Vector3;
 import java.util.ArrayList;
 
 public class TwoPlayerMatch implements Screen, InputProcessor{
 	private Game game;
+	private Viewport viewport;
+	private Camera camera;
 	private SpriteBatch batch;
 	private Texture img, img2;
 	private int width, height;
@@ -43,20 +49,29 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 	@Override
 	public void show() {
-		width = Gdx.graphics.getWidth();
-		height = Gdx.graphics.getHeight();
+		width = 2000;
+		height = 2000;
+		camera = new OrthographicCamera();
+		viewport = new FitViewport(width, height, camera);
+		viewport.apply();
+		camera.position.set(camera.viewportWidth/2,camera.viewportHeight/2,0);
+
+		//width = Gdx.graphics.getWidth();
+		//height = Gdx.graphics.getHeight();
 		Gdx.input.setInputProcessor(this);
 		blockSize = height/8;
 		batch = new SpriteBatch();
-		img = new Texture("purple.png");//dark
-		img2 = new Texture("cyan.png");//light
+		img = new Texture("white1.png");
+		//board color
+		Color lightColor = Color.LIGHT_GRAY;
+		Color darkColor = Color.DARK_GRAY;
 		//piece textures
 		loadPieceTextures();
 
 		//Add block background
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[r].length; c++) {
-				BoardCell boardTile = new BoardCell(((c%2==0 && r%2==0) || (c%2==1 && r%2==1)) ? img: img2, r, c);
+				BoardCell boardTile = new BoardCell(img, ((c%2==0 && r%2==0) || (c%2==1 && r%2==1)) ? darkColor: lightColor, r, c);
 				boardTile.setSize(blockSize, blockSize);
 				boardTile.setPosition(blockSize*c, blockSize*r);//FIXED row should ne HEIGHT, COLUMN SHOULD BE X
 				boardTile.setOriginCenter();
@@ -72,8 +87,10 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 	@Override
 	public void render(float delta) {
+		camera.update();
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		//draw board
 		for(int r=0; r<board.length; r++) {
@@ -93,7 +110,8 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		
+		viewport.update(width,height);
+		camera.position.set(camera.viewportWidth/2,camera.viewportHeight/2,0);
 	}
 
 	@Override
@@ -143,6 +161,11 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		//Convert screen to camera coordinates
+		Vector3 worldPoint = camera.unproject(new Vector3(screenX, screenY, 0), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+		screenX = (int) worldPoint.x;
+		screenY = height-(int) worldPoint.y;
+		//
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[0].length; c++) {
 				if(board[r][c].getBoundingRectangle().contains(screenX, height-screenY)) {
@@ -270,6 +293,8 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 						pieceTextures[r][c] = new Texture("blackking.png");
 					}
 				}
+				pieceTextures[r][c].setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
 			}
 		}
 	}
