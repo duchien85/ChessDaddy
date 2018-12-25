@@ -113,9 +113,12 @@ public class Piece extends Sprite {
             if(numberOfMoves==0) {
                 row = boardPosition.row + direction*2;
                 col = boardPosition.column;
-                if ((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
-                    if (!board[row][col].isOccupied())
-                        possibleMoves[row][col] = true;
+                //make sure pawn doesnt jump over something
+                if((row-direction < board.length && row-direction >= 0) && (col < board[row].length && col>=0) && !board[row-direction][col].isOccupied()) {
+                    if ((row < board.length && row >= 0) && (col < board[row].length && col >= 0)) {
+                        if (!board[row][col].isOccupied())
+                            possibleMoves[row][col] = true;
+                    }
                 }
             }
 
@@ -135,7 +138,26 @@ public class Piece extends Sprite {
             }
 
         } else if(pieceType == PieceType.KNIGHT) {
+            //L shape spots make sure spot isn't out of bounds and that there is no same color piece
+            int[][] lSpots = {
+                    {boardPosition.row-1, boardPosition.column-2},
+                    {boardPosition.row-1, boardPosition.column+2},
+                    {boardPosition.row+1, boardPosition.column-2},
+                    {boardPosition.row+1, boardPosition.column+2},
+                    {boardPosition.row-2, boardPosition.column-1},
+                    {boardPosition.row-2, boardPosition.column+1},
+                    {boardPosition.row+2, boardPosition.column-1},
+                    {boardPosition.row+2, boardPosition.column+1},
+            };
 
+            for(int p=0; p<lSpots.length; p++) {
+                int row = lSpots[p][0];
+                int col = lSpots[p][1];
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(!board[row][col].isOccupied() || (board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite()))
+                        possibleMoves[row][col] = true;
+                }
+            }
         }
 
         //if there is a same color piece in the move spot, make it false
