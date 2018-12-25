@@ -158,7 +158,7 @@ public class Piece extends Sprite {
                         possibleMoves[row][col] = true;
                 }
             }
-        } else if(pieceType == PieceType.BISHOP) {
+        } if(pieceType == PieceType.BISHOP || pieceType == PieceType.QUEEN) {
             //diagonal moving until blocked or out of bounds
             //if blocked by friendly piece don't allow move and break search to farther spot.
             //else if blocked by enemy piece stop search and include spot
@@ -238,7 +238,7 @@ public class Piece extends Sprite {
                     break;
                 }
             }
-        } else if(pieceType == PieceType.ROOK) {
+        } if(pieceType == PieceType.ROOK || pieceType == PieceType.QUEEN) {
             //orthogonal moving until blocked or out of bounds
             //if blocked by friendly piece don't allow move and break search to farther spot.
             //else if blocked by enemy piece stop search and include spot
@@ -318,10 +318,27 @@ public class Piece extends Sprite {
                     break;
                 }
             }
-        } else if(pieceType == PieceType.QUEEN) {
-
         } else if(pieceType == PieceType.KING) {
+            //L shape spots make sure spot isn't out of bounds and that there is no same color piece
+            int[][] kingSpots = {
+                    {boardPosition.row-1, boardPosition.column-1},
+                    {boardPosition.row, boardPosition.column-1},
+                    {boardPosition.row+1, boardPosition.column-1},
+                    {boardPosition.row+1, boardPosition.column},
+                    {boardPosition.row+1, boardPosition.column+1},
+                    {boardPosition.row, boardPosition.column+1},
+                    {boardPosition.row-1, boardPosition.column+1},
+                    {boardPosition.row-1, boardPosition.column},
+            };
 
+            for(int p=0; p<kingSpots.length; p++) {
+                int row = kingSpots[p][0];
+                int col = kingSpots[p][1];
+                if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
+                    if(!board[row][col].isOccupied() || (board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite()))
+                        possibleMoves[row][col] = true;
+                }
+            }
         }
 
         //if there is a same color piece in the move spot, make it false
