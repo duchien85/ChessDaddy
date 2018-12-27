@@ -388,29 +388,10 @@ public class Piece extends Sprite {
                         testBoard[boardPosition.row][boardPosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(j, k));
                         testBoard[j][k].setOccupiedPiece(board[boardPosition.row][boardPosition.column].getOccupiedPiece());
                         testBoard[boardPosition.row][boardPosition.column].setOccupiedPiece(null);
-                        testBoard[j][k].getOccupiedPiece().addMove();
+                        //testBoard[j][k].getOccupiedPiece().addMove();
                         //See if any enemy moves will check king
-                        for(int x = 0; x < testBoard.length; x++) {
-                            for(int y = 0; y < testBoard[x].length; y++) {
-                                if(testBoard[x][y].isOccupied() && testBoard[x][y].getOccupiedPiece().getIsWhite()!=isWhite) {
-                                    //Enemy piece
-                                    boolean[][] enemyMoves = new boolean[8][8];
-                                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, false);
-                                    //Check if enemy move contains the king on this test board
-                                    for(int p = 0; p < enemyMoves.length; p++) {
-                                        for(int q = 0; q < enemyMoves[p].length; q++) {
-                                            if(enemyMoves[p][q]) {
-                                                if(testBoard[p][q].isOccupied() && (testBoard[p][q].getOccupiedPiece().getPieceType()==PieceType.KING && testBoard[p][q].getOccupiedPiece().getIsWhite()==isWhite)) {
-                                                    //king in check break loop
-                                                    possibleMoves[j][k] = false;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        if(kingChecked(testBoard, isWhite))
+                            possibleMoves[j][k] = false;
                     }
                 }
             }
@@ -449,6 +430,30 @@ public class Piece extends Sprite {
 
     public void addMove() {
         numberOfMoves++;
+    }
+
+    public static boolean kingChecked(BoardCell[][] testBoard, boolean whiteTeam) {
+        for(int x = 0; x < testBoard.length; x++) {
+            for(int y = 0; y < testBoard[x].length; y++) {
+                if(testBoard[x][y].isOccupied() && testBoard[x][y].getOccupiedPiece().getIsWhite()!=whiteTeam) {
+                    //Enemy piece
+                    boolean[][] enemyMoves = new boolean[8][8];
+                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, false);
+                    //Check if enemy move contains the king on this test board
+                    for(int p = 0; p < enemyMoves.length; p++) {
+                        for(int q = 0; q < enemyMoves[p].length; q++) {
+                            if(enemyMoves[p][q]) {
+                                if(testBoard[p][q].isOccupied() && (testBoard[p][q].getOccupiedPiece().getPieceType()==PieceType.KING && testBoard[p][q].getOccupiedPiece().getIsWhite()==whiteTeam)) {
+                                    //king in check break loop
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }
