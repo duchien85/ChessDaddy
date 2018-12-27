@@ -35,8 +35,25 @@ public class Piece extends Sprite {
         setSize(blockSize, blockSize);
     }
 
+    public Piece(Piece piece) {
+        this.pieceColor = piece.getPieceColor();
+        this.isWhite = piece.getIsWhite();
+        this.pieceType = piece.getPieceType();
+        this.boardPosition = new BoardPosition(piece.getBoardPosition());
+        this.blockSize = piece.getBlockSize();
+        this.numberOfMoves = piece.getNumberOfMoves();
+    }
+
     public void setPieceColor(String color) { pieceColor = color;};
     public String getPieceColor() { return pieceColor;};
+
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    public int getNumberOfMoves() {
+        return numberOfMoves;
+    }
 
     public boolean getIsWhite() {
         return isWhite;
@@ -73,7 +90,7 @@ public class Piece extends Sprite {
      * @param board the board matrix of the game storing each position
      * @return boolean matrix of possible move locations (true means this player can move to this location)
      */
-    public boolean[][] getPossibleMoves(BoardCell[][] board) {
+    public boolean[][] getPossibleMoves(BoardCell[][] board, boolean checkCheck) {
         //start by 8 by 8 array with all false possible moves
         boolean[][] possibleMoves = {
                 {false, false, false, false, false, false, false, false},
@@ -349,7 +366,55 @@ public class Piece extends Sprite {
                 }
             }
         }
-        //if the move results in a the king being in danger, make it false
+
+        if(checkCheck) {
+            //if the move results in a the king being in check, make it false
+            //algorithm
+            //1. Redraw board with each possible move outcome for this player.
+            //  The "check" check part
+            //  2. Loop through each enemy piece to see if it threatens king
+            //  3. Stop if it threatens king mark move false
+            for(int j = 0; j < possibleMoves.length; j++) {
+                for(int k = 0; k < possibleMoves[j].length; k++) {
+                    if(possibleMoves[j][k]) {
+                        //copy board and see moves
+                        BoardCell[][] testBoard = new BoardCell[8][8];
+                        for(int x = 0; x < board.length; x++) {
+                            for (int y = 0; y < board[x].length; y++) {
+                                testBoard[x][y] = new BoardCell(board[x][y]);
+                            }
+                        }
+                        //do this possible move
+                        testBoard[boardPosition.row][boardPosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(j, k));
+                        testBoard[j][k].setOccupiedPiece(board[boardPosition.row][boardPosition.column].getOccupiedPiece());
+                        testBoard[boardPosition.row][boardPosition.column].setOccupiedPiece(null);
+                        testBoard[j][k].getOccupiedPiece().addMove();
+                        //See if any enemy moves will check king
+                        for(int x = 0; x < testBoard.length; x++) {
+                            for(int y = 0; y < testBoard[x].length; y++) {
+                                if(testBoard[x][y].isOccupied() && testBoard[x][y].getOccupiedPiece().getIsWhite()!=isWhite) {
+                                    //Enemy piece
+                                    boolean[][] enemyMoves = new boolean[8][8];
+                                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, false);
+                                    //Check if enemy move contains the king on this test board
+                                    for(int p = 0; p < enemyMoves.length; p++) {
+                                        for(int q = 0; q < enemyMoves[p].length; q++) {
+                                            if(enemyMoves[p][q]) {
+                                                if(testBoard[p][q].isOccupied() && (testBoard[p][q].getOccupiedPiece().getPieceType()==PieceType.KING && testBoard[p][q].getOccupiedPiece().getIsWhite()==isWhite)) {
+                                                    //king in check break loop
+                                                    possibleMoves[j][k] = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         return possibleMoves;
     }

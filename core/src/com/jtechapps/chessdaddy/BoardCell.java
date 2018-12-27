@@ -21,6 +21,15 @@ public class BoardCell extends Sprite {
         setColor(defaultColor);
     }
 
+    public BoardCell(BoardCell boardCell) {
+        if(boardCell.isOccupied())
+            this.occupiedPiece = new Piece(boardCell.getOccupiedPiece());
+        this.row = boardCell.row;
+        this.column = boardCell.column;
+        this.boardPosition = new BoardPosition(boardCell.getBoardPosition());
+        this.defaultColor = boardCell.getColor();
+    }
+
     public boolean isOccupied() {
         return (occupiedPiece!=null);
     }

@@ -11,4 +11,9 @@ public class BoardPosition {
         this.row = row;
         this.column = column;
     }
+
+    public BoardPosition(BoardPosition boardPosition) {
+        this.row = boardPosition.row;
+        this.column = boardPosition.column;
+    }
 }

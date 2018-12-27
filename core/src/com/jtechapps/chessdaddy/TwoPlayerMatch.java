@@ -178,7 +178,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 						activePosition.row = r;
 						pieceActive = true;
 						//load possible move locations
-						possibleMoves = board[r][c].getOccupiedPiece().getPossibleMoves(board);
+						possibleMoves = board[r][c].getOccupiedPiece().getPossibleMoves(board, true);
 						//show possible move locations
 						for(int row=0; row<board.length; row++) {
 							for(int col=0; col<board[row].length; col++) {
