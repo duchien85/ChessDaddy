@@ -204,6 +204,25 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 							board[r][c].getOccupiedPiece().addMove();
 							//
 							whitesTurns = !whitesTurns;//switch turns
+
+							//See if any piece has possible move to get out of check
+							boolean hasPossibleMove = hasPossibleMove();
+							//see if player is check mated
+							if(Piece.kingChecked(board, whitesTurns)) {
+
+								if(hasPossibleMove) {
+									System.out.println("Check on "+((whitesTurns) ? "white" : "black"));
+								} else {
+									System.out.println("Checkmate "+((whitesTurns) ? "white" : "black"));
+									System.out.println(((!whitesTurns) ? "white" : "black")+ " wins");
+								}
+							} else {
+								if(!hasPossibleMove) {
+									//STALEMATE
+									System.out.println(((whitesTurns) ? "white" : "black") + " in Stalemate");
+								}
+							}
+
 							//clear moves
 							clearPossibleMoves();
 						} else {
@@ -244,6 +263,29 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 	@Override
 	public boolean scrolled(int amount) {
+		return false;
+	}
+
+	/**
+	 * See if current player has a possible move
+	 * @return
+	 */
+	private boolean hasPossibleMove() {
+		for(int row = 0; row < board.length; row++) {
+			for(int col = 0; col < board[row].length; col++) {
+				if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()==whitesTurns) {
+					boolean[][] moves = board[row][col].getOccupiedPiece().getPossibleMoves(board, true);
+					//see if any true
+					for(int i = 0; i < moves.length; i++) {
+						for(int j = 0; j < moves[i].length; j++) {
+							if(moves[i][j]) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
 		return false;
 	}
 
