@@ -12,9 +12,9 @@ Game of Chess
 
 <h3>Current Game Mechanics</h3>
 <ul>
-  <li>Check :x:</li>
-  <li>Checkmate :x:</li>
-  <li>Stalemate :x:</li>
+  <li>Check :white_check_mark:</li>
+  <li>Checkmate :white_check_mark:</li>
+  <li>Stalemate :white_check_mark:</li>
   <li>Move History/Undo :x:</li>
   <li>Pawn
     <ul>
