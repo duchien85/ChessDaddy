@@ -9,15 +9,22 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.*;
 import java.util.ArrayList;
 
 public class TwoPlayerMatch implements Screen, InputProcessor{
+	private InputProcessor gameInputProcessor;
 	private Game game;
 	private Viewport viewport;
 	private Camera camera;
@@ -42,6 +49,12 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			{false, false, false, false, false, false, false, false},
 			{false, false, false, false, false, false, false, false}
 	};
+	//Game stage options
+	private Stage promotionStage;
+	private boolean promotePawn = false;
+	private boolean promoteWhite = false;
+	private BoardPosition promotePosition = new BoardPosition(0,0);
+
 
 	public TwoPlayerMatch(Game g) {
 		game = g;
@@ -59,6 +72,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		//width = Gdx.graphics.getWidth();
 		//height = Gdx.graphics.getHeight();
 		Gdx.input.setInputProcessor(this);
+		gameInputProcessor = this;
 		blockSize = height/8;
 		batch = new SpriteBatch();
 		img = new Texture("white1.png");
@@ -83,6 +97,111 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		//Spawn pieces
 		spawnPieces();
 
+		//Stage options for pawn promotion
+		promotionStage = new Stage(new FitViewport(1000, 1000));
+		//promotionStage.setDebugAll(true);
+
+		Image bg = new Image(new TextureRegion(img));
+		bg.setSize(1000, 1000);
+		bg.setColor(Color.DARK_GRAY);
+		promotionStage.addActor(bg);
+
+		Image queenBtn = new Image(new TextureRegion(pieceTextures[0][4]));
+		queenBtn.setHeight(256);
+		queenBtn.setWidth(256);
+		queenBtn.setPosition(500-256,500);
+		queenBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				if(promotePawn && promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[0][4]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.QUEEN);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				} else if(promotePawn && !promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[1][4]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.QUEEN);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				}
+			}
+		});
+		promotionStage.addActor(queenBtn);
+
+		Image knightBtn = new Image(new TextureRegion(pieceTextures[0][1]));
+		knightBtn.setHeight(256);
+		knightBtn.setWidth(256);
+		knightBtn.setPosition(500,500);
+		knightBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				if(promotePawn && promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[0][1]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.KNIGHT);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				} else if(promotePawn && !promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[1][1]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.KNIGHT);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				}
+			}
+		});
+		promotionStage.addActor(knightBtn);
+
+		Image rookBtn = new Image(new TextureRegion(pieceTextures[0][3]));
+		rookBtn.setHeight(256);
+		rookBtn.setWidth(256);
+		rookBtn.setPosition(500-256,500-256);
+		rookBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				if(promotePawn && promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[0][3]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.ROOK);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				} else if(promotePawn && !promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[1][3]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.ROOK);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				}
+			}
+		});
+		promotionStage.addActor(rookBtn);
+
+		Image bishopBtn = new Image(new TextureRegion(pieceTextures[0][2]));
+		bishopBtn.setHeight(256);
+		bishopBtn.setWidth(256);
+		bishopBtn.setPosition(500,500-256);
+		bishopBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked (InputEvent event, float x, float y) {
+				if(promotePawn && promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[0][2]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.BISHOP);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				} else if(promotePawn && !promoteWhite) {
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setTexture(pieceTextures[1][2]);
+					board[promotePosition.row][promotePosition.column].getOccupiedPiece().setPieceType(PieceType.BISHOP);
+					promotePawn = false;
+					checkGame();
+					Gdx.input.setInputProcessor(gameInputProcessor);
+				}
+			}
+		});
+		promotionStage.addActor(bishopBtn);
+
 	}
 
 	@Override
@@ -100,11 +219,11 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 					board[r][c].getOccupiedPiece().draw(batch);
 			}
 		}
-		//draw pieces
-		/*for(Piece piece : pieces) {
-			piece.draw(batch);
-		}*/
 		batch.end();
+		if(promotePawn) {
+			promotionStage.act(delta);
+			promotionStage.draw();
+		}
 	}
 
 	@Override
@@ -112,6 +231,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		// TODO Auto-generated method stub
 		viewport.update(width,height);
 		camera.position.set(camera.viewportWidth/2,camera.viewportHeight/2,0);
+		promotionStage.getViewport().update(width, height, true);
 	}
 
 	@Override
@@ -203,25 +323,18 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 							board[activePosition.row][activePosition.column].setOccupiedPiece(null);
 							board[r][c].getOccupiedPiece().addMove();
 							//
+							//See if pawn can be promoted
+							if(board[r][c].getOccupiedPiece().getPieceType()==PieceType.PAWN && r==0 || (board[r][c].getOccupiedPiece().getPieceType()==PieceType.PAWN && r==7)) {
+								promotePawn = true;
+								promoteWhite = whitesTurns;
+								promotePosition.row = r;
+								promotePosition.column = c;
+								Gdx.input.setInputProcessor(promotionStage);
+							}
+							//
 							whitesTurns = !whitesTurns;//switch turns
 
-							//See if any piece has possible move to get out of check
-							boolean hasPossibleMove = hasPossibleMove();
-							//see if player is check mated
-							if(Piece.kingChecked(board, whitesTurns)) {
-
-								if(hasPossibleMove) {
-									System.out.println("Check on "+((whitesTurns) ? "white" : "black"));
-								} else {
-									System.out.println("Checkmate "+((whitesTurns) ? "white" : "black"));
-									System.out.println(((!whitesTurns) ? "white" : "black")+ " wins");
-								}
-							} else {
-								if(!hasPossibleMove) {
-									//STALEMATE
-									System.out.println(((whitesTurns) ? "white" : "black") + " in Stalemate");
-								}
-							}
+							checkGame();
 
 							//clear moves
 							clearPossibleMoves();
@@ -287,6 +400,26 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			}
 		}
 		return false;
+	}
+
+	private void checkGame() {
+		//See if any piece has possible move to get out of check
+		boolean hasPossibleMove = hasPossibleMove();
+		//see if player is check mated
+		if(Piece.kingChecked(board, whitesTurns)) {
+
+			if(hasPossibleMove) {
+				System.out.println("Check on "+((whitesTurns) ? "white" : "black"));
+			} else {
+				System.out.println("Checkmate "+((whitesTurns) ? "white" : "black"));
+				System.out.println(((!whitesTurns) ? "white" : "black")+ " wins");
+			}
+		} else {
+			if(!hasPossibleMove) {
+				//STALEMATE
+				System.out.println(((whitesTurns) ? "white" : "black") + " in Stalemate");
+			}
+		}
 	}
 
 	private void loadPieceTextures() {
