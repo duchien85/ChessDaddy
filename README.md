@@ -21,7 +21,7 @@ Game of Chess
       <li>Movement :white_check_mark:</li>
       <li>Capturing :white_check_mark:</li>
       <li>En Passant :x:</li>
-      <li>Promotion :x:</li>
+      <li>Promotion :white_check_mark:</li>
     </ul>
   </li>
   <li>Kinght
