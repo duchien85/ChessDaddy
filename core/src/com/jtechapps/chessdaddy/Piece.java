@@ -24,6 +24,8 @@ public class Piece extends Sprite {
     private int blockSize;
     //game mechanics
     private int numberOfMoves = 0;
+    private int previousTurn = 0;
+    private int currentTurn = 0;
 
     public Piece(Texture texture, boolean isWhite, PieceType pieceType, BoardPosition boardPosition, int blockSize) {
         super(texture);
@@ -428,8 +430,10 @@ public class Piece extends Sprite {
         return arr;
     }
 
-    public void addMove() {
+    public void addMove(int currentTurn) {
         numberOfMoves++;
+        this.previousTurn = this.currentTurn;
+        this.currentTurn = currentTurn;
     }
 
     public static boolean kingChecked(BoardCell[][] testBoard, boolean whiteTeam) {

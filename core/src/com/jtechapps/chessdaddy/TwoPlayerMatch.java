@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import java.util.ArrayList;
 
 public class TwoPlayerMatch implements Screen, InputProcessor{
@@ -29,7 +31,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	private Viewport viewport;
 	private Camera camera;
 	private SpriteBatch batch;
-	private Texture img, img2;
+	private Texture img;
 	private int width, height;
 	private int blockSize;
 	private BoardCell[][] board = new BoardCell[8][8];
@@ -38,6 +40,8 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	//game mechanics
 	private boolean whitesTurns = true;
 	private boolean pieceActive = false;
+	private int whiteMoves = 0;
+	private int blackMoves = 0;
 	private BoardPosition activePosition = new BoardPosition(0,0);
 	private boolean[][] possibleMoves =  {
 			{false, false, false, false, false, false, false, false},
@@ -50,10 +54,12 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			{false, false, false, false, false, false, false, false}
 	};
 	//Game stage options
-	private Stage promotionStage;
+	private Stage promotionStage, endGameStage;
 	private boolean promotePawn = false;
 	private boolean promoteWhite = false;
 	private BoardPosition promotePosition = new BoardPosition(0,0);
+	private BitmapFont regularFont;
+	private Label winnerLabel;
 
 
 	public TwoPlayerMatch(Game g) {
@@ -99,7 +105,20 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 
 		//Stage options for pawn promotion
 		promotionStage = new Stage(new FitViewport(1000, 1000));
+		endGameStage = new Stage(new FitViewport(1000, 1000));
 		//promotionStage.setDebugAll(true);
+
+		//Text stuff
+		regularFont = new BitmapFont(Gdx.files.internal("regular.fnt"));
+		Label.LabelStyle regularStyle = new Label.LabelStyle();
+		regularStyle.font = regularFont;
+		regularStyle.fontColor = Color.RED;
+
+		winnerLabel = new Label("", regularStyle);
+		winnerLabel.setSize(endGameStage.getWidth(),50);
+		winnerLabel.setPosition(0,endGameStage.getHeight()/2-25);
+		winnerLabel.setAlignment(Align.center);
+		endGameStage.addActor(winnerLabel);
 
 		Image bg = new Image(new TextureRegion(img));
 		bg.setSize(1000, 1000);
@@ -224,6 +243,8 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			promotionStage.act(delta);
 			promotionStage.draw();
 		}
+		endGameStage.act();
+		endGameStage.draw();
 	}
 
 	@Override
@@ -256,7 +277,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 	public void dispose() {
 		batch.dispose();
 		img.dispose();
-		img2.dispose();
+		regularFont.dispose();
 		for(int r=0; r<pieceTextures.length; r++) {
 			for(int c=0; c<pieceTextures.length; c++) {
 				pieceTextures[r][c].dispose();
@@ -321,7 +342,13 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 							board[activePosition.row][activePosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(r,c));
 							board[r][c].setOccupiedPiece(board[activePosition.row][activePosition.column].getOccupiedPiece());
 							board[activePosition.row][activePosition.column].setOccupiedPiece(null);
-							board[r][c].getOccupiedPiece().addMove();
+							if(whitesTurns) {
+								whiteMoves++;
+								board[r][c].getOccupiedPiece().addMove(whiteMoves);
+							} else {
+								blackMoves++;
+								board[r][c].getOccupiedPiece().addMove(blackMoves);
+							}
 							//
 							//See if pawn can be promoted
 							if(board[r][c].getOccupiedPiece().getPieceType()==PieceType.PAWN && r==0 || (board[r][c].getOccupiedPiece().getPieceType()==PieceType.PAWN && r==7)) {
@@ -413,11 +440,13 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 			} else {
 				System.out.println("Checkmate "+((whitesTurns) ? "white" : "black"));
 				System.out.println(((!whitesTurns) ? "white" : "black")+ " wins");
+				winnerLabel.setText(((!whitesTurns) ? "White" : "Black")+ " Wins");
 			}
 		} else {
 			if(!hasPossibleMove) {
 				//STALEMATE
 				System.out.println(((whitesTurns) ? "white" : "black") + " in Stalemate");
+				winnerLabel.setText(((whitesTurns) ? "White" : "Black") + " in Stalemate");
 			}
 		}
 	}
