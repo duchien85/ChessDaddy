@@ -234,7 +234,14 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[r].length; c++) {
 				board[r][c].draw(batch);
-				if(board[r][c].isOccupied())
+				if(board[r][c].isOccupied() && !board[r][c].getOccupiedPiece().isAnimating())
+					board[r][c].getOccupiedPiece().draw(batch);
+			}
+		}
+		//draw moving animations on top
+		for(int r=0; r<board.length; r++) {
+			for(int c=0; c<board[r].length; c++) {
+				if(board[r][c].isOccupied() && board[r][c].getOccupiedPiece().isAnimating())
 					board[r][c].getOccupiedPiece().draw(batch);
 			}
 		}

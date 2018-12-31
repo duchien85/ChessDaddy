@@ -1,7 +1,9 @@
 package com.jtechapps.chessdaddy;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 
@@ -26,6 +28,11 @@ public class Piece extends Sprite {
     private int numberOfMoves = 0;
     private int previousTurn = 0;
     private int currentTurn = 0;
+    //slide animation
+    private Vector2 nextPosition = new Vector2(0 ,0);
+    private Vector2 moveDirection = new Vector2(0 ,0);
+    private float moveSpeed = 1.0f;// 1/t to complete animation
+    private boolean isAnimating = false;
 
     public Piece(Texture texture, boolean isWhite, PieceType pieceType, BoardPosition boardPosition, int blockSize) {
         super(texture);
@@ -34,6 +41,8 @@ public class Piece extends Sprite {
         this.pieceType = pieceType;
         this.blockSize = blockSize;
         setBoardPosition(boardPosition);
+        setPosition(blockSize*boardPosition.column, blockSize*boardPosition.row);
+        nextPosition.set(blockSize*boardPosition.column, blockSize*boardPosition.row);
         setSize(blockSize, blockSize);
     }
 
@@ -83,8 +92,27 @@ public class Piece extends Sprite {
      */
     public void setBoardPosition(BoardPosition position) {
         this.boardPosition = position;
-        //update actual position of sprite
-        this.setPosition(blockSize*boardPosition.column, blockSize*boardPosition.row);
+        //set next position for move animation
+        nextPosition.set(blockSize*boardPosition.column, blockSize*boardPosition.row);
+        moveDirection.set(nextPosition.x-this.getX(), nextPosition.y-this.getY());
+        moveDirection.scl(moveSpeed);
+        isAnimating = true;
+    }
+
+    @Override
+    public void draw(Batch batch) {
+        super.draw(batch);
+        float deltaT = Gdx.graphics.getDeltaTime();
+        if(isAnimating) {
+            if (Math.abs(nextPosition.x - getX()) < 5 && Math.abs(nextPosition.y - getY()) < 5) {
+                //close enough to next position it should be, set it.
+                setPosition(nextPosition.x, nextPosition.y);
+                isAnimating = false;
+            } else {
+                this.setPosition(getX() + moveDirection.x * deltaT, getY() + moveDirection.y * deltaT);
+            }
+        }
+
     }
 
     /**
@@ -458,6 +486,10 @@ public class Piece extends Sprite {
             }
         }
         return false;
+    }
+
+    public boolean isAnimating() {
+        return isAnimating;
     }
 
 }
