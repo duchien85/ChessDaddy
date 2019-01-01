@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
 
 /**
  * Created by JacobM on 12/23/18.
@@ -27,12 +26,13 @@ public class Piece extends Sprite {
     //game mechanics
     private int numberOfMoves = 0;
     private int previousTurn = 0;
-    private int currentTurn = 0;
     //slide animation
     private Vector2 nextPosition = new Vector2(0 ,0);
     private Vector2 moveDirection = new Vector2(0 ,0);
     private float moveSpeed = 1.0f;// 1/t to complete animation
     private boolean isAnimating = false;
+    //En passant pawn
+    boolean enPassant = false;//True if this piece should capture piece passing over
 
     public Piece(Texture texture, boolean isWhite, PieceType pieceType, BoardPosition boardPosition, int blockSize) {
         super(texture);
@@ -120,7 +120,7 @@ public class Piece extends Sprite {
      * @param board the board matrix of the game storing each position
      * @return boolean matrix of possible move locations (true means this player can move to this location)
      */
-    public boolean[][] getPossibleMoves(BoardCell[][] board, boolean checkCheck) {
+    public boolean[][] getPossibleMoves(BoardCell[][] board, int currentTurn, boolean checkCheck) {
         //start by 8 by 8 array with all false possible moves
         boolean[][] possibleMoves = {
                 {false, false, false, false, false, false, false, false},
@@ -182,6 +182,37 @@ public class Piece extends Sprite {
             if((row < board.length && row >= 0) && (col < board[row].length && col>=0)) {
                 if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()!=getIsWhite())
                     possibleMoves[row][col] = true;
+            }
+
+            //En Passant Weird Rule
+            //left of
+            if((getIsWhite() && boardPosition.row==4) || (!getIsWhite() && boardPosition.row==3)) {
+                //Piece must be on the correct rank. Keep in mind zero indexed rows
+                row = boardPosition.row;
+                col = boardPosition.column - 1;
+                if ((row < board.length && row >= 0) && (col < board[row].length && col >= 0)) {
+                    if (board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite() != getIsWhite()) {
+                        //make sure piece just moved two pieces
+                        //System.out.println("another piece = "+board[row][col].getOccupiedPiece().getPreviousTurn() + " this turn "+ currentTurn);
+                        if(board[row][col].getOccupiedPiece().getNumberOfMoves()==1 && board[row][col].getOccupiedPiece().getPreviousTurn()==(currentTurn+(!isWhite ? 1 : 0))) {
+                            possibleMoves[row+direction][col] = true;
+                            enPassant = true;
+                        }
+                    }
+                }
+                //right of
+                row = boardPosition.row;
+                col = boardPosition.column + 1;
+                if ((row < board.length && row >= 0) && (col < board[row].length && col >= 0)) {
+                    if (board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite() != getIsWhite()) {
+                        //make sure piece just moved two pieces
+                        //System.out.println("another piece = "+board[row][col].getOccupiedPiece().getPreviousTurn() + " this turn "+ currentTurn);
+                        if(board[row][col].getOccupiedPiece().getNumberOfMoves()==1 && board[row][col].getOccupiedPiece().getPreviousTurn()==(currentTurn+(!isWhite ? 1 : 0))) {
+                            possibleMoves[row+direction][col] = true;
+                            enPassant = true;
+                        }
+                    }
+                }
             }
 
         } else if(pieceType == PieceType.KNIGHT) {
@@ -420,7 +451,7 @@ public class Piece extends Sprite {
                         testBoard[boardPosition.row][boardPosition.column].setOccupiedPiece(null);
                         //testBoard[j][k].getOccupiedPiece().addMove();
                         //See if any enemy moves will check king
-                        if(kingChecked(testBoard, isWhite))
+                        if(kingChecked(testBoard, currentTurn+(isWhite ? 1 : 0), isWhite))
                             possibleMoves[j][k] = false;
                     }
                 }
@@ -458,19 +489,18 @@ public class Piece extends Sprite {
         return arr;
     }
 
-    public void addMove(int currentTurn) {
+    public void addMove(int turn) {
         numberOfMoves++;
-        this.previousTurn = this.currentTurn;
-        this.currentTurn = currentTurn;
+        this.previousTurn = turn;
     }
 
-    public static boolean kingChecked(BoardCell[][] testBoard, boolean whiteTeam) {
+    public static boolean kingChecked(BoardCell[][] testBoard, int turn, boolean whiteTeam) {
         for(int x = 0; x < testBoard.length; x++) {
             for(int y = 0; y < testBoard[x].length; y++) {
                 if(testBoard[x][y].isOccupied() && testBoard[x][y].getOccupiedPiece().getIsWhite()!=whiteTeam) {
                     //Enemy piece
                     boolean[][] enemyMoves = new boolean[8][8];
-                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, false);
+                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, turn, false);
                     //Check if enemy move contains the king on this test board
                     for(int p = 0; p < enemyMoves.length; p++) {
                         for(int q = 0; q < enemyMoves[p].length; q++) {
@@ -490,6 +520,10 @@ public class Piece extends Sprite {
 
     public boolean isAnimating() {
         return isAnimating;
+    }
+
+    public int getPreviousTurn() {
+        return previousTurn;
     }
 
 }

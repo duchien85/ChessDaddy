@@ -326,7 +326,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 						activePosition.row = r;
 						pieceActive = true;
 						//load possible move locations
-						possibleMoves = board[r][c].getOccupiedPiece().getPossibleMoves(board, true);
+						possibleMoves = board[r][c].getOccupiedPiece().getPossibleMoves(board, (whitesTurns ? whiteMoves : blackMoves), true);
 						//show possible move locations
 						for(int row=0; row<board.length; row++) {
 							for(int col=0; col<board[row].length; col++) {
@@ -349,6 +349,12 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 							board[activePosition.row][activePosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(r,c));
 							board[r][c].setOccupiedPiece(board[activePosition.row][activePosition.column].getOccupiedPiece());
 							board[activePosition.row][activePosition.column].setOccupiedPiece(null);
+							//En Passant
+							if(board[r][c].getOccupiedPiece().getPieceType()==PieceType.PAWN && board[r][c].getOccupiedPiece().enPassant) {
+								board[r+(whitesTurns ? -1 : 1)][c].setOccupiedPiece(null);
+								board[r][c].getOccupiedPiece().enPassant = false;
+							}
+
 							if(whitesTurns) {
 								whiteMoves++;
 								board[r][c].getOccupiedPiece().addMove(whiteMoves);
@@ -421,7 +427,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		for(int row = 0; row < board.length; row++) {
 			for(int col = 0; col < board[row].length; col++) {
 				if(board[row][col].isOccupied() && board[row][col].getOccupiedPiece().getIsWhite()==whitesTurns) {
-					boolean[][] moves = board[row][col].getOccupiedPiece().getPossibleMoves(board, true);
+					boolean[][] moves = board[row][col].getOccupiedPiece().getPossibleMoves(board, (whitesTurns ? whiteMoves : blackMoves), true);
 					//see if any true
 					for(int i = 0; i < moves.length; i++) {
 						for(int j = 0; j < moves[i].length; j++) {
@@ -440,7 +446,7 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 		//See if any piece has possible move to get out of check
 		boolean hasPossibleMove = hasPossibleMove();
 		//see if player is check mated
-		if(Piece.kingChecked(board, whitesTurns)) {
+		if(Piece.kingChecked(board, (whitesTurns ? whiteMoves : blackMoves), whitesTurns)) {
 
 			if(hasPossibleMove) {
 				System.out.println("Check on "+((whitesTurns) ? "white" : "black"));
