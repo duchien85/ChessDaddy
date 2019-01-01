@@ -20,7 +20,7 @@ Game of Chess
     <ul>
       <li>Movement :white_check_mark:</li>
       <li>Capturing :white_check_mark:</li>
-      <li>En Passant :x:</li>
+      <li>En Passant :white_check_mark:</li>
       <li>Promotion :white_check_mark:</li>
     </ul>
   </li>
