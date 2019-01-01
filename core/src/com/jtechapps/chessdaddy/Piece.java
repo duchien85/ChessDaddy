@@ -447,8 +447,12 @@ public class Piece extends Sprite {
                         }
                         //do this possible move
                         testBoard[boardPosition.row][boardPosition.column].getOccupiedPiece().setBoardPosition(new BoardPosition(j, k));
-                        testBoard[j][k].setOccupiedPiece(board[boardPosition.row][boardPosition.column].getOccupiedPiece());
+                        testBoard[j][k].setOccupiedPiece(testBoard[boardPosition.row][boardPosition.column].getOccupiedPiece());
                         testBoard[boardPosition.row][boardPosition.column].setOccupiedPiece(null);
+                        if(testBoard[j][k].getOccupiedPiece().getPieceType()==PieceType.PAWN && testBoard[j][k].getOccupiedPiece().enPassant) {
+                            testBoard[j+(isWhite ? -1 : 1)][k].setOccupiedPiece(null);
+                            testBoard[j][k].getOccupiedPiece().enPassant = false;
+                        }
                         //testBoard[j][k].getOccupiedPiece().addMove();
                         //See if any enemy moves will check king
                         if(kingChecked(testBoard, currentTurn+(isWhite ? 1 : 0), isWhite))
