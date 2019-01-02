@@ -107,12 +107,22 @@ public class Piece extends Sprite {
         super.draw(batch);
         float deltaT = Gdx.graphics.getDeltaTime();
         if(isAnimating) {
-            if (Math.abs(nextPosition.x - getX()) < 5 && Math.abs(nextPosition.y - getY()) < 5) {
+            if (Math.abs(nextPosition.x - getX()) < 15 && Math.abs(nextPosition.y - getY()) < 15) {
                 //close enough to next position it should be, set it.
                 setPosition(nextPosition.x, nextPosition.y);
                 isAnimating = false;
+            } else if(((moveDirection.x/moveDirection.y)-((nextPosition.x-getX())/(nextPosition.y-getY())))>10) {
+                //see if player is moving toward spot.
+                //Fix pieces moving off to nowhere
+                setPosition(nextPosition.x, nextPosition.y);
+                isAnimating = false;
             } else {
-                this.setPosition(getX() + moveDirection.x * deltaT, getY() + moveDirection.y * deltaT);
+                Vector2 currentDirection = new Vector2(nextPosition.x-getX(), nextPosition.y-getY());
+                if(currentDirection.hasOppositeDirection(moveDirection)) {
+                    setPosition(nextPosition.x, nextPosition.y);
+                    isAnimating = false;
+                } else
+                    this.setPosition(getX() + moveDirection.x * deltaT, getY() + moveDirection.y * deltaT);
             }
         }
 
