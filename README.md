@@ -52,7 +52,7 @@ Game of Chess
     <ul>
       <li>Movement :white_check_mark:</li>
       <li>Capturing :white_check_mark:</li>
-      <li>Castling :x:</li>
+      <li>Castling :white_check_mark:</li>
     </ul>
   </li>
   <li>Single Player AI :x:
