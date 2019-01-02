@@ -33,6 +33,9 @@ public class Piece extends Sprite {
     private boolean isAnimating = false;
     //En passant pawn
     boolean enPassant = false;//True if this piece should capture piece passing over
+    //Castling
+    boolean canCastleKingSide = false;
+    boolean canCastleQueenSide = false;
 
     public Piece(Texture texture, boolean isWhite, PieceType pieceType, BoardPosition boardPosition, int blockSize) {
         super(texture);
@@ -416,6 +419,34 @@ public class Piece extends Sprite {
                         possibleMoves[row][col] = true;
                 }
             }
+
+            //Castling
+            canCastleKingSide = false;
+            canCastleQueenSide = false;
+            if(checkCheck && numberOfMoves==0 && !positionThreatened(board, currentTurn, boardPosition.row, boardPosition.column, isWhite)) {
+                int row = boardPosition.row;
+                int col = boardPosition.column;
+                //King's side
+                //clear path and path isn't threatened
+                if(!board[row][col+1].isOccupied() && !board[row][col+2].isOccupied()) {
+                    if(!positionThreatened(board, currentTurn, row, col+1, isWhite) && !positionThreatened(board, currentTurn, row, col+2, isWhite)) {
+                        if(board[row][col + 3].isOccupied() && board[row][col + 3].getOccupiedPiece().getPieceType() == PieceType.ROOK && board[row][col + 3].getOccupiedPiece().getNumberOfMoves() == 0) {
+                            possibleMoves[row][col + 2] = true;
+                            canCastleKingSide = true;
+                        }
+                    }
+                }
+                //Queen's side
+                //clear path and path isn't threatened
+                if(!board[row][col-1].isOccupied() && !board[row][col-2].isOccupied() && !board[row][col-3].isOccupied()) {
+                    if(!positionThreatened(board, currentTurn, row, col-1, isWhite) && !positionThreatened(board, currentTurn, row, col-2, isWhite)) {
+                        if(board[row][col-4].isOccupied() && board[row][col-4].getOccupiedPiece().getPieceType() == PieceType.ROOK && board[row][col-4].getOccupiedPiece().getNumberOfMoves() == 0) {
+                            possibleMoves[row][col - 2] = true;
+                            canCastleQueenSide = true;
+                        }
+                    }
+                }
+            }
         }
 
         //if there is a same color piece in the move spot, make it false
@@ -516,6 +547,31 @@ public class Piece extends Sprite {
                             }
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * see if the current row col of the current team is threatened by an enemy piece
+     * @param testBoard
+     * @param turn
+     * @param row
+     * @param col
+     * @param whiteTeam the current team
+     * @return true if position threatened
+     */
+    public static boolean positionThreatened(BoardCell[][] testBoard, int turn, int row, int col, boolean whiteTeam) {
+        for(int x = 0; x < testBoard.length; x++) {
+            for(int y = 0; y < testBoard[x].length; y++) {
+                if(testBoard[x][y].isOccupied() && testBoard[x][y].getOccupiedPiece().getIsWhite()!=whiteTeam) {
+                    //Enemy piece
+                    boolean[][] enemyMoves = new boolean[8][8];
+                    enemyMoves = testBoard[x][y].getOccupiedPiece().getPossibleMoves(testBoard, turn, false);
+                    //Check position contains an enemy's possible move
+                    if(enemyMoves[row][col])
+                        return true;
                 }
             }
         }

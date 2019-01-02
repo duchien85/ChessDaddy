@@ -354,6 +354,21 @@ public class TwoPlayerMatch implements Screen, InputProcessor{
 								board[r+(whitesTurns ? -1 : 1)][c].setOccupiedPiece(null);
 								board[r][c].getOccupiedPiece().enPassant = false;
 							}
+							//Castling
+							//King's side
+							if(board[r][c].getOccupiedPiece().canCastleKingSide && board[r][c+1].isOccupied() && board[r][c+1].getOccupiedPiece().getPieceType()==PieceType.ROOK) {
+								board[r][c+1].getOccupiedPiece().setBoardPosition(new BoardPosition(r, c-1));
+								board[r][c-1].setOccupiedPiece(board[r][c+1].getOccupiedPiece());
+								board[r][c+1].setOccupiedPiece(null);
+								board[r][c].getOccupiedPiece().canCastleKingSide = false;
+							}
+							//Queen's side
+							if(board[r][c].getOccupiedPiece().canCastleQueenSide && board[r][c-2].isOccupied() && board[r][c-2].getOccupiedPiece().getPieceType()==PieceType.ROOK) {
+								board[r][c-2].getOccupiedPiece().setBoardPosition(new BoardPosition(r, c+1));
+								board[r][c+1].setOccupiedPiece(board[r][c-2].getOccupiedPiece());
+								board[r][c-2].setOccupiedPiece(null);
+								board[r][c].getOccupiedPiece().canCastleQueenSide = false;
+							}
 
 							if(whitesTurns) {
 								whiteMoves++;
