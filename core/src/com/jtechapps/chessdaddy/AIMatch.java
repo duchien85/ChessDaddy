@@ -57,6 +57,7 @@ public class AIMatch implements Screen, InputProcessor{
 	private BoardPosition promotePosition = new BoardPosition(0,0);
 	private BitmapFont regularFont;
 	private Label winnerLabel;
+	private boolean gameOver = false;
 
 
 	public AIMatch(Game g) {
@@ -236,10 +237,13 @@ public class AIMatch implements Screen, InputProcessor{
 			}
 		}
 		//draw moving animations on top
+		boolean animating = false;
 		for(int r=0; r<board.length; r++) {
 			for(int c=0; c<board[r].length; c++) {
-				if(board[r][c].isOccupied() && board[r][c].getOccupiedPiece().isAnimating())
+				if(board[r][c].isOccupied() && board[r][c].getOccupiedPiece().isAnimating()) {
 					board[r][c].getOccupiedPiece().draw(batch);
+					animating = true;
+				}
 			}
 		}
 		batch.end();
@@ -249,6 +253,16 @@ public class AIMatch implements Screen, InputProcessor{
 		}
 		endGameStage.act();
 		endGameStage.draw();
+
+		//see if AI should make move
+		if(!gameOver && !whitesTurns && !animating) {
+			//AI turn to make a move
+			aiTurn();
+			whitesTurns = !whitesTurns;//switch turns
+			checkGame();
+			//clear moves
+			clearPossibleMoves();
+		}
 	}
 
 	@Override
@@ -306,6 +320,9 @@ public class AIMatch implements Screen, InputProcessor{
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if(gameOver) {
+			return false;
+		}
 		//Convert screen to camera coordinates
 		Vector3 worldPoint = camera.unproject(new Vector3(screenX, screenY, 0), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 		screenX = (int) worldPoint.x;
@@ -404,15 +421,7 @@ public class AIMatch implements Screen, InputProcessor{
 
 					}
 
-					//see if AI should make move
-					if(!whitesTurns) {
-						//AI turn to make a move
-						aiTurn();
-						whitesTurns = !whitesTurns;//switch turns
-						checkGame();
-						//clear moves
-						clearPossibleMoves();
-					}
+
 				}
 
 			}
@@ -476,12 +485,14 @@ public class AIMatch implements Screen, InputProcessor{
 				System.out.println("Checkmate "+((whitesTurns) ? "white" : "black"));
 				System.out.println(((!whitesTurns) ? "white" : "black")+ " wins");
 				winnerLabel.setText(((!whitesTurns) ? "White" : "Black")+ " Wins");
+				gameOver = true;
 			}
 		} else {
 			if(!hasPossibleMove) {
 				//STALEMATE
 				System.out.println(((whitesTurns) ? "white" : "black") + " in Stalemate");
 				winnerLabel.setText(((whitesTurns) ? "White" : "Black") + " in Stalemate");
+				gameOver = true;
 			}
 		}
 	}
@@ -626,11 +637,13 @@ public class AIMatch implements Screen, InputProcessor{
 	}
 
 	private void aiPlay() {
-		int depth = 2;
+		int depth = 4;
 		int minMove = 10000;
-		int turn = 1;
+		int turn = blackMoves;
 		boolean max = false;
 		int[] move = {0,0,0,0};
+		boolean hasMove = false;
+
 		BoardCell[][] tBoard = copyBoard(board);
 		for(int row = 0; row < tBoard.length; row++) {
 			for(int col = 0; col < tBoard[row].length; col++) {
@@ -659,12 +672,18 @@ public class AIMatch implements Screen, InputProcessor{
 									move[1] = col;
 									move[2] = i;
 									move[3] = j;
+									hasMove = true;
 								}
 							}
 						}
 					}
 				}
 			}
+		}
+		//See if piece actually has moves
+		if(!hasMove) {
+			checkGame();
+			return;
 		}
 		int r = move[2];
 		int c = move[3];
