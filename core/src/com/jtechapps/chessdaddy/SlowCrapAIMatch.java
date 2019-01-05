@@ -648,7 +648,7 @@ public class AIMatch implements Screen, InputProcessor{
 		for(int row = 0; row < tBoard.length; row++) {
 			for(int col = 0; col < tBoard[row].length; col++) {
 				if(tBoard[row][col].isOccupied() && !tBoard[row][col].getOccupiedPiece().getIsWhite()) {
-					boolean[][] moves = tBoard[row][col].getOccupiedPiece().getPossibleMoves(tBoard, blackMoves, true);
+					boolean[][] moves = tBoard[row][col].getOccupiedPiece().getPossibleMoves(tBoard, turn, true);
 					//Get each pieces moves
 					for(int i = 0; i < moves.length; i++) {
 						for(int j = 0; j < moves[i].length; j++) {
@@ -665,7 +665,7 @@ public class AIMatch implements Screen, InputProcessor{
 								testBoard[i][j].getOccupiedPiece().addMove(turn);
 								//
 
-								int testMove = minimax(testBoard, false, depth-1);
+								int testMove = minimax(testBoard, true, depth-1, turn, Integer.MIN_VALUE, Integer.MAX_VALUE);
 								if(testMove<minMove) {
 									minMove = testMove;
 									move[0] = row;
@@ -726,7 +726,7 @@ public class AIMatch implements Screen, InputProcessor{
 		//
 	}
 
-	private int minimax(BoardCell[][] tBoard, boolean max, int depth) {
+	private int minimax(BoardCell[][] tBoard, boolean max, int depth, int move, int alpha, int beta) {
 		if(depth==0) {
 			return heuristicValue(tBoard);
 		}
@@ -751,11 +751,20 @@ public class AIMatch implements Screen, InputProcessor{
 										testBoard[i+(max ? -1 : 1)][j].setOccupiedPiece(null);
 										testBoard[i][j].getOccupiedPiece().enPassant = false;
 									}
-									testBoard[i][j].getOccupiedPiece().addMove(2-depth);
+									testBoard[i][j].getOccupiedPiece().addMove(move);
 									//
-									int testMove = minimax(testBoard, !max, depth-1);
+									int testMove = minimax(testBoard, !max, depth-1, move+1, alpha, beta);
 									if(testMove>maxMove)
 										maxMove = testMove;
+									alpha = (testMove>alpha) ? testMove : alpha;
+									if(alpha>=beta) {
+										//exit big messy messy loop
+										j = moves[i].length;
+										i = moves.length;
+										col = tBoard[row].length;
+										row = tBoard.length;
+										break;
+									}
 								}
 							}
 						}
@@ -784,11 +793,20 @@ public class AIMatch implements Screen, InputProcessor{
 										testBoard[i+(max ? -1 : 1)][j].setOccupiedPiece(null);
 										testBoard[i][j].getOccupiedPiece().enPassant = false;
 									}
-									testBoard[i][j].getOccupiedPiece().addMove(2-depth);
+									testBoard[i][j].getOccupiedPiece().addMove(move);
 									//
-									int testMove = minimax(testBoard, !max, depth-1);
+									int testMove = minimax(testBoard, !max, depth-1, move+1, alpha, beta);
 									if(testMove<minMove)
 										minMove = testMove;
+									alpha = (testMove<beta) ? testMove : beta;
+									if(alpha>=beta) {
+										//exit big messy messy loop
+										j = moves[i].length;
+										i = moves.length;
+										col = tBoard[row].length;
+										row = tBoard.length;
+										break;
+									}
 								}
 							}
 						}
