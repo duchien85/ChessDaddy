@@ -2,6 +2,12 @@
 Game of Chess
 
 ![Screenshot](screenshot1.png)
+<h2>Log</h2>
+<ul>
+  <li>AI is very dumb and slow</li>
+  <li>TODO: Organize Two Player Match and make AI Object</li>
+  <li>TODO: Board class to hold BoardCell matrix and get possible moves and game status.</li>
+</ul>
 <h2>Features</h2>
 <h3>Graphics</h3>
 <ul>
