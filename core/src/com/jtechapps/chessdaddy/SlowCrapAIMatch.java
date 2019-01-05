@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-public class AIMatch implements Screen, InputProcessor{
+public class SlowCrapAIMatch implements Screen, InputProcessor{
 	private InputProcessor gameInputProcessor;
 	private Game game;
 	private Viewport viewport;
@@ -60,7 +60,7 @@ public class AIMatch implements Screen, InputProcessor{
 	private boolean gameOver = false;
 
 
-	public AIMatch(Game g) {
+	public SlowCrapAIMatch(Game g) {
 		game = g;
 	}
 

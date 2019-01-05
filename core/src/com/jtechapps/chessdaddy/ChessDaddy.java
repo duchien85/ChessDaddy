@@ -10,7 +10,7 @@ public class ChessDaddy extends Game {
 	
 	@Override
 	public void create () {
-		this.setScreen(new AIMatch(this));
+		this.setScreen(new TwoPlayerMatch(this));
 	}
 
 	
